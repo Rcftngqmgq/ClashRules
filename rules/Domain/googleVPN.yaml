@@ -1,0 +1,4 @@
+payload:
+  - '*.cloud.cupronickel.goog'
+  - '*.googleapis.com'
+  - '*.gstatic.com'
