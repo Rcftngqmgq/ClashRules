@@ -8,7 +8,6 @@ DOMAIN-SUFFIX,longportapp.com
 DOMAIN-SUFFIX,lbctrl.com
 DOMAIN-SUFFIX,lbkrs.com
 DOMAIN-SUFFIX,wbrks.com
-
 DOMAIN-SUFFIX,hsbc.com.hk
 DOMAIN-SUFFIX,hsbc.com.cn
 DOMAIN-SUFFIX,hsbcqh.com.cn
@@ -54,7 +53,6 @@ DOMAIN-SUFFIX,hsbc.ca
 DOMAIN-SUFFIX,hsbc.co.jp
 DOMAIN-SUFFIX,hsbc.fr
 DOMAIN-SUFFIX,hsbctrinkaus.de
-
 DOMAIN-SUFFIX,fsmone.com
 DOMAIN-SUFFIX,fsmone.com.hk
 DOMAIN-SUFFIX,fsmone.com.my
@@ -69,18 +67,15 @@ DOMAIN-SUFFIX,ifastgp.com.hk
 DOMAIN-SUFFIX,ifastnetwork.com
 DOMAIN-SUFFIX,ifastps.com.cn
 DOMAIN-SUFFIX,ifasttv.com
-
 DOMAIN-SUFFIX,okx.com
 DOMAIN-SUFFIX,okex.com
 DOMAIN-SUFFIX,oklink.com
-
 DOMAIN-SUFFIX,transferwise.com
 DOMAIN-SUFFIX,wise.com
 DOMAIN-SUFFIX,wisecoin.com
 DOMAIN-SUFFIX,wiseid.com
 DOMAIN-SUFFIX,wisekey.com
 DOMAIN-SUFFIX,wisekey.com.hk
-
 DOMAIN-SUFFIX,za.group
 DOMAIN-SUFFIX,airstarbank.com
 DOMAIN-SUFFIX,alipayhk.com
@@ -88,5 +83,4 @@ DOMAIN-SUFFIX,usmart.hk
 DOMAIN-SUFFIX,zvsthk.com
 DOMAIN-SUFFIX,ypt.com
 DOMAIN-SUFFIX,myfin.bg
-
 DOMAIN-SUFFIX,kyarucloud.moe
