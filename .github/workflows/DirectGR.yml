@@ -1,0 +1,69 @@
+name: Sync and Compile DirectGR Rules
+
+on:
+  schedule:
+    - cron: '0 18 1 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  directgr_rules:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Git user
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Install mihomo
+        run: |
+          version=$(curl -sL https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/version.txt)
+          curl -sL "https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/mihomo-linux-amd64-${version}.gz" \
+            | gunzip -c > /usr/local/bin/mihomo
+          chmod +x /usr/local/bin/mihomo
+
+      - name: Fetch DirectGR.list
+        run: |
+          mkdir -p rules/Domain
+          curl -sL "https://raw.githubusercontent.com/Rcftngqmgq/ClashRules/Rules/refs/heads/main/rules/Domain/DirectGR.list" \
+            -o rules/Domain/DirectGR.list
+
+      - name: Generate domain list from DirectGR.list
+        run: |
+          grep -Eo 'DOMAIN-SUFFIX,[^,]+' rules/Domain/DirectGR.list \
+            | sed 's/DOMAIN-SUFFIX,//' \
+            | awk '{print "*." $0}' \
+            | sort -u \
+            > rules/Domain/DirectGR-domain.list
+
+      - name: Convert domain list to YAML
+        run: |
+          echo "payload:" > rules/Domain/DirectGR.yaml
+          awk '{print "  - \047" $0 "\047"}' rules/Domain/DirectGR-domain.list \
+            >> rules/Domain/DirectGR.yaml
+
+      - name: Convert YAML to MRS
+        run: |
+          mihomo convert-ruleset domain yaml \
+            rules/Domain/DirectGR.yaml \
+            rules/Domain/DirectGR.mrs
+
+      - name: Clean up intermediate files
+        run: |
+          rm -f rules/Domain/DirectGR-domain.list
+
+      - name: Commit and push changes
+        run: |
+          git add rules/Domain/DirectGR.list rules/Domain/DirectGR.yaml rules/Domain/DirectGR.mrs
+          git diff-index --quiet HEAD -- || (
+            git commit -m "chore: update DirectGR ruleset (mrs)" &&
+            git push
+          )
