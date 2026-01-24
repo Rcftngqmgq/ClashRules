@@ -2,7 +2,7 @@ name: Sync and Compile Google VPN Rules
 
 on:
   schedule:
-    - cron: '0 18 1 * *'
+    - cron: '0 18 1 * *'  # 每天北京时间02:00执行
   workflow_dispatch:
 
 permissions:
@@ -13,51 +13,50 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Checkout the repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up Git user
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+    - name: Set up Git user
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Install mihomo
-        run: |
-          version=$(curl -sL https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/version.txt)
-          curl -sL "https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/mihomo-linux-amd64-${version}.gz" \
-            | gunzip -c > /usr/local/bin/mihomo
-          chmod +x /usr/local/bin/mihomo
+    - name: Install mihomo
+      run: |
+        version=$(curl -sL https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/version.txt)
+        curl -sL "https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/mihomo-linux-amd64-${version}.gz" | \
+          gunzip -c > /usr/local/bin/mihomo && chmod +x /usr/local/bin/mihomo
 
-      - name: Fetch GoogleVPN.list
-        run: |
-          mkdir -p rules/Domain
-          curl -sL "https://raw.githubusercontent.com/Rcftngqmgq/ClashRules/Rules/refs/heads/main/rules/Domain/GoogleVPN.list" \
-            -o rules/Domain/GoogleVPN.list
+    - name: Fetch Google VPN Rules
+      run: |
+        mkdir -p rules/Domain  # 确保目录存在
 
-      - name: Compile GoogleVPN rules
-        run: |
-          grep -Eo 'DOMAIN-SUFFIX,[^,]+' rules/Domain/GoogleVPN.list \
-            | sed 's/DOMAIN-SUFFIX,//' \
-            | awk '{print "*." $0}' \
-            | sort -u \
-            > rules/Domain/GoogleVPN-domain.list
+        # 下载 Google VPN 规则文件
+        curl -sL "https://raw.githubusercontent.com/Rcftngqmgq/ClashRules/refs/heads/main/rules/Domain/googleVPN.list" -o rules/Domain/googleVPN.list
 
-          echo "payload:" > rules/Domain/GoogleVPN.yaml
-          awk '{print "  - \047" $0 "\047"}' rules/Domain/GoogleVPN-domain.list \
-            >> rules/Domain/GoogleVPN.yaml
+    - name: Extract DOMAIN-SUFFIX rules from googleVPN.list
+      run: |
+        # 提取 googleVPN.list 中的 DOMAIN-SUFFIX 规则，并添加 *.
+        grep -Eo 'DOMAIN-SUFFIX,[^,]+' rules/Domain/googleVPN.list | sed 's/DOMAIN-SUFFIX,//' | awk '{print "*." $0}' > rules/Domain/googleVPN-domain.list
 
-          mihomo convert-ruleset domain yaml \
-            rules/Domain/GoogleVPN.yaml \
-            rules/Domain/GoogleVPN.mrs
+    - name: Convert Google VPN Rules to YAML
+      run: |
+        echo "payload:" > rules/Domain/googleVPN.yaml
+        sort -u rules/Domain/googleVPN-domain.list | awk '{print "  - \047" $0 "\047"}' >> rules/Domain/googleVPN.yaml
 
-          rm -f rules/Domain/GoogleVPN-domain.list
+    - name: Convert Google VPN Rules to MRS
+      run: |
+        # 使用 mihomo 转换为 MRS 格式
+        mihomo convert-ruleset domain yaml rules/Domain/googleVPN.yaml rules/Domain/googleVPN.mrs
 
-      - name: Commit and push changes
-        run: |
-          git add rules/Domain/GoogleVPN.list rules/Domain/GoogleVPN.yaml rules/Domain/GoogleVPN.mrs
-          git diff-index --quiet HEAD -- || (
-            git commit -m "chore: update GoogleVPN ruleset (mrs)" &&
-            git push
-          )
+    - name: Clean up the source files
+      run: |
+        # 删除中间文件，但保留 googleVPN.list 和 googleVPN.yaml
+        rm -f rules/Domain/googleVPN-domain.list
+
+    - name: Commit and Push Changes
+      run: |
+        git add .
+        git diff-index --quiet HEAD -- || (git commit -m "Updated Google VPN rules (googleVPN.list -> googleVPN.mrs)" && git push)
