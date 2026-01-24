@@ -33,7 +33,7 @@ jobs:
       - name: Fetch DirectGR.list
         run: |
           mkdir -p rules/Domain
-          curl -sL "https://raw.githubusercontent.com/Rcftngqmgq/ClashRules/Rules/refs/heads/main/rules/Domain/DirectGR.list" \
+          curl -sL "https://raw.githubusercontent.com/Rcftngqmgq/ClashRules/blob/main/rules/Domain/DirectGR.list" \
             -o rules/Domain/DirectGR.list
 
       - name: Generate domain list from DirectGR.list
@@ -67,3 +67,4 @@ jobs:
             git commit -m "chore: update DirectGR ruleset (mrs)" &&
             git push
           )
+
