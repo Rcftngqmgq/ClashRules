@@ -4,26 +4,28 @@ DOMAIN-SUFFIX,youtusoft.com
 DOMAIN-SUFFIX,hostbuf.com
 DOMAIN-SUFFIX,tcpspeed.com
 DOMAIN-SUFFIX,wn1998.com
-- IP-CIDR,101.32.72.254/32,no-resolve
-- IP-CIDR,45.56.98.223/32,no-resolve
-- IP-CIDR,121.40.235.65/32,no-resolve
-- IP-CIDR,185.107.56.192/32,no-resolve
-- IP-CIDR,185.107.56.54/32,no-resolve
-- IP-CIDR,185.107.56.53/32,no-resolve
-- IP-CIDR,74.63.241.25/32,no-resolve
-- IP-CIDR,74.63.241.19/32,no-resolve
-- IP-CIDR,199.115.116.216/32,no-resolve
-- IP-CIDR,82.192.82.228/32,no-resolve
-- IP-CIDR,82.192.82.226/32,no-resolve
-- IP-CIDR,207.244.65.58/32,no-resolve
-- IP-CIDR,69.162.95.4/32,no-resolve
-- IP-CIDR,69.162.95.3/32,no-resolve
-- IP-CIDR,37.48.65.155/32,no-resolve
-- IP-CIDR,37.48.65.145/32,no-resolve
-- IP-CIDR,37.48.65.153/32,no-resolve
-- IP-CIDR,47.76.185.223/32,no-resolve
-- IP-CIDR,3.33.243.145/32,no-resolve
-- IP-CIDR,15.197.204.56/32,no-resolve
-- IP-CIDR,162.210.199.85/32,no-resolve
-- IP-CIDR,162.210.196.168/32,no-resolve
+IP-CIDR,101.32.72.254/32,no-resolve
+IP-CIDR,101.32.72.254/32,no-resolve
+IP-CIDR,45.56.98.223/32,no-resolve
+IP-CIDR,121.40.235.65/32,no-resolve
+IP-CIDR,185.107.56.192/32,no-resolve
+IP-CIDR,185.107.56.54/32,no-resolve
+IP-CIDR,185.107.56.53/32,no-resolve
+IP-CIDR,74.63.241.25/32,no-resolve
+IP-CIDR,74.63.241.19/32,no-resolve
+IP-CIDR,199.115.116.216/32,no-resolve
+IP-CIDR,82.192.82.228/32,no-resolve
+IP-CIDR,82.192.82.226/32,no-resolve
+IP-CIDR,207.244.65.58/32,no-resolve
+IP-CIDR,69.162.95.4/32,no-resolve
+IP-CIDR,69.162.95.3/32,no-resolve
+IP-CIDR,37.48.65.155/32,no-resolve
+IP-CIDR,37.48.65.145/32,no-resolve
+IP-CIDR,37.48.65.153/32,no-resolve
+IP-CIDR,47.76.185.223/32,no-resolve
+IP-CIDR,3.33.243.145/32,no-resolve
+IP-CIDR,15.197.204.56/32,no-resolve
+IP-CIDR,162.210.199.85/32,no-resolve
+IP-CIDR,162.210.196.168/32,no-resolve
+
 
