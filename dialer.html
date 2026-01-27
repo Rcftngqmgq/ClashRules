@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Clash转SOCKS5配置助手</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #f3f4f6; color: #374151; font-family: system-ui, sans-serif; }
+        .card { background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 20px; margin-bottom: 20px; }
+        .section-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; display: flex; align-items: center; border-left: 4px solid #3b82f6; padding-left: 10px; }
+        .code-area { background: #1a202c; color: #e2e8f0; padding: 15px; border-radius: 6px; font-family: 'Fira Code', monospace; font-size: 13px; line-height: 1.5; white-space: pre-wrap; min-height: 40px; border: 1px solid #2d3748; }
+        .btn-blue { background: #3b82f6; color: white; padding: 8px 20px; border-radius: 6px; font-weight: 500; cursor: pointer; border: none; }
+        .btn-blue:hover { background: #2563eb; }
+        .btn-red { background: #ef4444; color: white; padding: 4px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; border: none; }
+        input, select, textarea { border: 1px solid #d1d5db; border-radius: 6px; padding: 8px; outline: none; }
+    </style>
+</head>
+<body class="p-8 max-w-6xl mx-auto">
+
+<div class="card">
+    <div class="section-title">① 批量粘贴节点 (支持 SOCKS5 及 Clash 节点协议)</div>
+    <textarea id="nodeInput" class="w-full h-24 mb-4 font-mono text-xs" placeholder="支持以下格式：
+1. SOCKS5 常用格式：
+   - user:pass@host:port
+   - host:port:user:pass
+   - socks5://user:pass@host:port (URL格式)
+   - host:port (匿名)
+2. Clash 节点配置：
+   - {name: ..., type: socks5, server: ..., port: ...}
+3. 链接格式：
+   - vless://... / trojan://..."></textarea>
+    <div id="parseErrorHint" class="text-red-500 text-xs mt-2 hidden"></div>
+    <div class="flex gap-4">
+        <button onclick="handleParse(true)" class="btn-blue flex-1">重新解析（清空旧节点）</button>
+        <button onclick="handleParse(false)" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg flex-1 hover:bg-gray-300 font-medium">追加解析</button>
+    </div>
+</div>
+
+<div class="card">
+    <div class="section-title">② 节点列表 (可改名 + 前置代理)</div>
+    <div id="nodeListContainer" class="space-y-4 text-sm"></div>
+</div>
+
+<div class="card">
+    <div class="section-title">③ SRC-IP 规则</div>
+    <div class="flex gap-3 items-center mb-4">
+        <input type="text" id="srcIpInput" class="w-48" placeholder="192.168.100.2">
+        <span class="font-bold text-gray-400">/32</span>
+        <select id="targetPolicySelect" class="flex-1"></select>
+        <button onclick="addRule()" class="btn-blue">添加规则</button>
+    </div>
+    <div id="ruleListDisplay" class="flex flex-wrap gap-2"></div>
+</div>
+
+<div class="space-y-6">
+    <div>
+        <div class="flex justify-between items-center mb-2">
+            <span class="font-bold text-gray-700">④ Dialer 节点 (Proxies)</span>
+            <button onclick="copy('outProxies')" class="text-blue-600 font-medium">复制</button>
+        </div>
+        <div class="code-area" id="outProxies"></div>
+    </div>
+    <div>
+        <div class="flex justify-between items-center mb-2">
+            <span class="font-bold text-gray-700">⑤ 节点锚点添加 (proxy-groups)</span>
+            <button onclick="copy('outNames')" class="text-blue-600 font-medium">复制</button>
+        </div>
+        <div class="code-area" id="outNames"></div>
+    </div>
+    <div>
+        <div class="flex justify-between items-center mb-2">
+            <span class="font-bold text-gray-700">⑥ SRC-IP 规则输出</span>
+            <button onclick="copy('outRules')" class="text-blue-600 font-medium">复制</button>
+        </div>
+        <div class="code-area" id="outRules"></div>
+    </div>
+</div>
+
+<script>
+let nodes = [];
+let rules = [];
+const PRESETS = ["选择前置","美国故转","香港故转","韩国故转","新加坡故转","日本故转","台湾故转","自建/家宽节点"];
+
+function genChainName() {
+    const base = "🔗 链式代理";
+    const used = nodes.map(n => n.customName);
+    if (!used.includes(base)) return base;
+    let i = 2;
+    while (used.includes(base + i)) i++;
+    return base + i;
+}
+
+function showParseError(msg) {
+    const el = document.getElementById('parseErrorHint');
+    el.innerText = msg;
+    el.classList.remove('hidden');
+    setTimeout(() => el.classList.add('hidden'), 3000);
+}
+
+function smartParse(line) {
+    line = line.trim();
+    if (!line) return null;
+
+    if (line.startsWith('- {') || (line.includes('type:') && line.includes('server:'))) {
+        return { type: 'YAML', content: line };
+    }
+    if (line.includes('://')) {
+        return { type: 'URL', content: line };
+    }
+
+    let host, port, user, pass;
+    if (line.includes('@')) {
+        const [auth, addr] = line.split('@');
+        [user, pass] = auth.split(':');
+        [host, port] = addr.split(':');
+    } else {
+        const parts = line.split(':');
+        host = parts[0]; port = parts[1];
+        user = parts[2]; pass = parts[3];
+    }
+
+    if (host && port) {
+        return { type: 'SOCKS5', host, port, user, pass };
+    }
+    return null;
+}
+
+function handleParse(isClear) {
+    const input = document.getElementById('nodeInput').value.trim();
+    if (isClear) {
+        nodes = [];
+        rules = [];
+        if (!input) { render(); return; }
+    }
+
+    let errorCount = 0;
+
+    input.split('\n').forEach(line => {
+        const raw = line.trim();
+        if (!raw) return;
+
+        const parsed = smartParse(raw);
+        if (!parsed) { errorCount++; return; }
+
+        const fingerprint = parsed.type === 'SOCKS5'
+            ? `${parsed.host}:${parsed.port}:${parsed.user||''}:${parsed.pass||''}`
+            : raw;
+
+        if (nodes.some(n => n.fingerprint === fingerprint)) return;
+
+        nodes.push({
+            ...parsed,
+            raw,
+            fingerprint,
+            id: Date.now() + Math.random(),
+            customName: genChainName(),
+            dialer: "CUSTOM",
+            customDialer: "🔌 链式节点"
+        });
+    });
+
+    if (errorCount > 0) {
+        showParseError(`有 ${errorCount} 行无法识别，已自动忽略`);
+    }
+
+    render();
+}
+
+function render() {
+    renderNodeList();
+    updatePolicySelect();
+    renderRules();
+    syncAll();
+}
+
+function renderNodeList() {
+    const container = document.getElementById('nodeListContainer');
+    container.innerHTML = nodes.length ? '' : '<div class="text-gray-400 italic text-center py-4">无节点数据</div>';
+
+    nodes.forEach((node, index) => {
+        const div = document.createElement('div');
+        div.className = "p-4 border rounded-lg bg-gray-50 space-y-2";
+
+        let options = PRESETS.map(p =>
+            `<option value="${p}" ${node.dialer === p ? 'selected' : ''}>${p}</option>`
+        ).join('');
+        options += `<option value="CUSTOM" ${node.dialer === 'CUSTOM' ? 'selected' : ''}>手动输入...</option>`;
+
+        let typeLabel = node.type === 'SOCKS5' ? 'SOCKS5' : '自建协议';
+
+        div.innerHTML = `
+            <div class="flex items-center gap-4">
+                <span class="text-[10px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded font-bold uppercase">${typeLabel}</span>
+                <input type="text" class="w-1/4 font-bold text-blue-600" value="${node.customName}"
+                    oninput="nodes[${index}].customName=this.value;syncAll();updatePolicySelect();">
+                <select class="w-1/4 bg-white" onchange="nodes[${index}].dialer=this.value;renderNodeList();syncAll();">
+                    ${options}
+                </select>
+                <input type="text" class="flex-1 bg-white ${node.dialer === 'CUSTOM' ? '' : 'hidden'}"
+                    value="${node.customDialer}"
+                    oninput="nodes[${index}].customDialer=this.value;syncAll();">
+                <button onclick="removeNode(${index})" class="btn-red">删除</button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function removeNode(idx) {
+    const name = nodes[idx].customName;
+    nodes.splice(idx, 1);
+    rules = rules.filter(r => r.policy !== name);
+    render();
+}
+
+function updatePolicySelect() {
+    const select = document.getElementById('targetPolicySelect');
+    select.innerHTML = nodes.map(n => `<option value="${n.customName}">${n.customName}</option>`).join('');
+}
+
+function addRule() {
+    const ip = document.getElementById('srcIpInput').value.trim() || '192.168.50.101';
+    const policy = document.getElementById('targetPolicySelect').value;
+    if (ip && policy) { rules.push({ ip, policy }); render(); }
+}
+
+function renderRules() {
+    const container = document.getElementById('ruleListDisplay');
+    container.innerHTML = rules.map((r, i) => `
+        <div class="bg-blue-600 text-white px-3 py-1 rounded-md text-sm flex items-center gap-2">
+            ${r.ip}/32 ➔ ${r.policy}
+            <span class="cursor-pointer font-bold hover:text-red-200"
+                onclick="rules.splice(${i},1);render();">×</span>
+        </div>
+    `).join('');
+}
+
+function syncAll() {
+    let proxyText = "";
+    nodes.forEach(n => {
+        let dialer = n.dialer === 'CUSTOM'
+            ? n.customDialer
+            : (n.dialer === '选择前置' ? '' : n.dialer);
+        let dialerStr = dialer ? `, dialer-proxy: "${dialer}"` : "";
+
+        if (n.type === 'SOCKS5') {
+            proxyText += `  - {name: "${n.customName}", type: socks5, server: ${n.host}, port: ${n.port}, username: ${n.user}, password: ${n.pass}, udp: true${dialerStr}}\n`;
+        } else if (n.type === 'YAML') {
+            let content = n.content.replace(/name:\s*["']?([^,"'}]+)["']?/, `name: "${n.customName}"`);
+            if (dialerStr) content = content.replace(/}$/, `${dialerStr}}`);
+            proxyText += `  ${content}\n`;
+        } else {
+            proxyText += `  # [链接格式请先转换] ${n.content}\n`;
+        }
+    });
+
+    document.getElementById('outProxies').innerText = proxyText;
+    document.getElementById('outNames').innerText = nodes.map(n => `  - ${n.customName}`).join('\n');
+    document.getElementById('outRules').innerText = rules.map(r => `- SRC-IP-CIDR,${r.ip}/32,${r.policy}`).join('\n');
+}
+
+function copy(id) {
+    const text = document.getElementById(id).innerText;
+    if (text) {
+        navigator.clipboard.writeText(text);
+        const btn = event.target;
+        const old = btn.innerText;
+        btn.innerText = "已复制";
+        setTimeout(() => btn.innerText = old, 1000);
+    }
+}
+</script>
+</body>
+</html>
