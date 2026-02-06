@@ -79,7 +79,7 @@
 <script>
 let nodes = [];
 let rules = [];
-const PRESETS = ["选择前置","美国故转","香港故转","韩国故转","新加坡故转","日本故转","台湾故转","自建/家宽节点"];
+const PRESETS = ["选择前置","🔯 美国故转","🔯 香港故转","🔯 狮城故转","🔯 日本故转","🔯 韩国故转","🔯 台湾故转"];
 
 function genChainName() {
     const base = "🔗 链式代理";
@@ -256,7 +256,6 @@ function syncAll() {
 
     document.getElementById('outProxies').innerText = proxyText;
     document.getElementById('outNames').innerText = nodes.map(n => `  - ${n.customName}`).join('\n');
-
     document.getElementById('outRules').innerText = rules.map((r, i) => {
         const node = nodes[i];
         const policy = node ? node.customName : r.policy;
