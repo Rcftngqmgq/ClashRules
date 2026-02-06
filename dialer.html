@@ -256,7 +256,12 @@ function syncAll() {
 
     document.getElementById('outProxies').innerText = proxyText;
     document.getElementById('outNames').innerText = nodes.map(n => `  - ${n.customName}`).join('\n');
-    document.getElementById('outRules').innerText = rules.map(r => `- SRC-IP-CIDR,${r.ip}/32,${r.policy}`).join('\n');
+
+    document.getElementById('outRules').innerText = rules.map((r, i) => {
+        const node = nodes[i];
+        const policy = node ? node.customName : r.policy;
+        return `- SRC-IP-CIDR,${r.ip}/32,${policy}`;
+    }).join('\n');
 }
 
 function copy(id) {
