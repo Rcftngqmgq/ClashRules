@@ -7,6 +7,3 @@
 DOMAIN-SUFFIX,cloud.cupronickel.goog
 DOMAIN-SUFFIX,googleapis.com
 DOMAIN-SUFFIX,gstatic.com
-# Google Play
-DOMAIN-SUFFIX,googleapis.cn
-DOMAIN-SUFFIX,xn--ngstr-lra8j.com
