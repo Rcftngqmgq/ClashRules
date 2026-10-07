@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  fakeip_filter_rules:
+  fakeipfilter_cn_rules:
     runs-on: ubuntu-latest
 
     defaults:
@@ -44,7 +44,7 @@ jobs:
 
           mihomo -v
 
-      - name: Fetch FakeIP-Filter Rules
+      - name: Fetch fakeipfilter-cn Rules
         run: |
           set -euo pipefail
 
@@ -56,7 +56,7 @@ jobs:
 
           test -s rules/Domain/fakeipfilter-cn.list
 
-      - name: Convert FakeIP-Filter Rules to YAML
+      - name: Convert fakeipfilter-cn Rules to YAML
         run: |
           set -euo pipefail
 
@@ -65,20 +65,25 @@ jobs:
 
           source = Path("rules/Domain/fakeipfilter-cn.list")
           target = Path("rules/Domain/fakeipfilter-cn.yaml")
-          rules = set()
+
+          rules = []
+          seen = set()
 
           for line in source.read_text(encoding="utf-8-sig").splitlines():
-              # 清理注释、空白，保留原有通配符。
+              # 清理注释和空白，不修改源 list。
               rule = line.split("#", 1)[0].strip().lower()
-              if rule:
-                  rules.add(rule)
+
+              # 保留原有通配符，按首次出现的顺序去重。
+              if rule and rule not in seen:
+                  seen.add(rule)
+                  rules.append(rule)
 
           if not rules:
               raise SystemExit("错误：没有有效规则，停止生成")
 
           payload = [
               "  - '" + rule.replace("'", "''") + "'"
-              for rule in sorted(rules)
+              for rule in rules
           ]
 
           target.write_text(
@@ -86,18 +91,21 @@ jobs:
               encoding="utf-8",
           )
 
-          print(f"已生成 YAML，共 {len(rules)} 条规则")
+          print(f"已按源文件顺序生成 YAML，共 {len(rules)} 条规则")
           PY
 
-      - name: Convert FakeIP-Filter Rules to MRS
+      - name: Convert fakeipfilter-cn Rules to MRS
         run: |
           set -euo pipefail
 
           mihomo convert-ruleset domain yaml \
             rules/Domain/fakeipfilter-cn.yaml \
-            rules/Domain/fakeipfilter-cn.mrs
+            "$RUNNER_TEMP/fakeipfilter-cn.mrs"
 
-          test -s rules/Domain/fakeipfilter-cn.mrs
+          test -s "$RUNNER_TEMP/fakeipfilter-cn.mrs"
+
+          cp "$RUNNER_TEMP/fakeipfilter-cn.mrs" \
+            rules/Domain/fakeipfilter-cn.mrs
 
       - name: Commit and Push Changes
         run: |
@@ -113,8 +121,6 @@ jobs:
             exit 0
           fi
 
-          git commit -m "Update FakeIP-Filter rules (list -> yaml -> mrs)"
-
-          # 其他工作流可能同时提交，推送前先合并远端更新。
+          git commit -m "Update fakeipfilter-cn rules (list -> yaml -> mrs)"
           git pull --rebase
           git push
