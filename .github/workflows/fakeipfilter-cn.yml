@@ -2,7 +2,7 @@ name: Sync and Compile fakeipfilter-cn Rules
 
 on:
   schedule:
-    - cron: '0 20 * * *' # 每天北京时间 04:00 执行
+    - cron: '0 18 1 * *'  # 每天北京时间02:00执行
   workflow_dispatch:
 
 permissions:
