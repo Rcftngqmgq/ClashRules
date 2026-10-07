@@ -38,10 +38,16 @@ jobs:
 
     - name: Extract DOMAIN and DOMAIN-SUFFIX rules from DirectGR.list
       run: |
-        # 提取 DOMAIN-SUFFIX 规则并加上 *.
-        grep -Eo 'DOMAIN-SUFFIX,[^,]+' rules/Domain/DirectGR.list | sed 's/DOMAIN-SUFFIX,//' | sed 's/^/*./' > rules/Domain/DirectGR-domain.list
-        # 提取 DOMAIN 规则
-        grep -Eo 'DOMAIN,[^,]+' rules/Domain/DirectGR.list | sed 's/DOMAIN,//' >> rules/Domain/DirectGR-domain.list
+        # DOMAIN-SUFFIX 转为 +.，匹配自身及所有子域名
+        grep -Eo 'DOMAIN-SUFFIX,[^,]+' rules/Domain/DirectGR.list \
+          | sed 's/DOMAIN-SUFFIX,//' \
+          | sed 's/^/+./' \
+          > rules/Domain/DirectGR-domain.list
+
+        # DOMAIN 保持精确域名匹配
+        grep -Eo 'DOMAIN,[^,]+' rules/Domain/DirectGR.list \
+          | sed 's/DOMAIN,//' \
+          >> rules/Domain/DirectGR-domain.list
 
     - name: Convert DirectGR Rules to YAML
       run: |
