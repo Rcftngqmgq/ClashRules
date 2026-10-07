@@ -38,8 +38,11 @@ jobs:
 
     - name: Extract DOMAIN-SUFFIX rules from googleVPN.list
       run: |
-        # 提取 googleVPN.list 中的 DOMAIN-SUFFIX 规则，并添加 *.
-        grep -Eo 'DOMAIN-SUFFIX,[^,]+' rules/Domain/googleVPN.list | sed 's/DOMAIN-SUFFIX,//' | awk '{print "*." $0}' > rules/Domain/googleVPN-domain.list
+        # DOMAIN-SUFFIX 转为 +.，匹配自身及所有子域名
+        grep -Eo 'DOMAIN-SUFFIX,[^,]+' rules/Domain/googleVPN.list \
+          | sed 's/DOMAIN-SUFFIX,//' \
+          | awk '{print "+." $0}' \
+          > rules/Domain/googleVPN-domain.list
 
     - name: Convert Google VPN Rules to YAML
       run: |
