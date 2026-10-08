@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "domain_suffix": [
+        "hsbc.com.hk",
+        "hsbc.com",
+        "za.group",
+        "elebank.com",
+        "airstarbank.com",
+        "alipayhk.com",
+        "clubsim.com.hk",
+        "hkcsl.com",
+        "fortress.com.hk",
+        "three.com.hk",
+        "wise.com",
+        "ifastgb.com",
+        "myfin.bg",
+        "ypt.com",
+        "immortalwrt.org",
+        "kyarucloud.moe",
+        "openwrt.org",
+        "dnshe.com",
+        "vumstar.com"
+      ]
+    }
+  ]
+}
