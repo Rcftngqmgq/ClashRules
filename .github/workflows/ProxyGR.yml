@@ -2,7 +2,7 @@ name: Sync and Compile ProxyGR Rules
 
 on:
   schedule:
-    - cron: '0 18 1 * *'  # 北京时间 02:00 执行
+    - cron: '0 18 1 * *'  # 北京时间每月 2 日 02:00 执行
   workflow_dispatch:
 
 permissions:
@@ -13,54 +13,102 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout the repository
-      uses: actions/checkout@v5
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout the repository
+        uses: actions/checkout@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Set up Git user
-      run: |
-        git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
+      - name: Set up Git user
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
-    - name: Install mihomo
-      run: |
-        version=$(curl -sL https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/version.txt)
-        curl -sL "https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/mihomo-linux-amd64-${version}.gz" | \
-          gunzip -c > /usr/local/bin/mihomo && chmod +x /usr/local/bin/mihomo
+      - name: Install mihomo
+        run: |
+          set -euo pipefail
 
-    - name: Fetch ProxyGR Rules
-      run: |
-        mkdir -p rules/Domain  # 确保目录存在
+          version=$(curl -fsSL "https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/version.txt")
 
-        # 下载 ProxyGR 规则文件
-        curl -sL "https://raw.githubusercontent.com/Rcftngqmgq/ClashRules/refs/heads/main/rules/Domain/ProxyGR.list" -o rules/Domain/ProxyGR.list
+          curl -fsSL "https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/mihomo-linux-amd64-${version}.gz" \
+            | gunzip -c > /usr/local/bin/mihomo
 
-    - name: Extract DOMAIN and DOMAIN-SUFFIX rules from ProxyGR.list
-      run: |
-        # DOMAIN-SUFFIX 转为 +.，匹配自身及所有子域名
-        grep -Eo 'DOMAIN-SUFFIX,[^,]+' rules/Domain/ProxyGR.list \
-          | sed 's/DOMAIN-SUFFIX,//' \
-          | sed 's/^/+./' \
-          > rules/Domain/ProxyGR-domain.list
+          chmod +x /usr/local/bin/mihomo
 
-        # DOMAIN 保持精确域名匹配
-        grep -Eo 'DOMAIN,[^,]+' rules/Domain/ProxyGR.list \
-          | sed 's/DOMAIN,//' \
-          >> rules/Domain/ProxyGR-domain.list
+      - name: Fetch ProxyGR Rules
+        run: |
+          mkdir -p rules/Domain
 
-    - name: Convert ProxyGR Rules to YAML
-      run: |
-        echo "payload:" > rules/Domain/ProxyGR.yaml
-        sort -u rules/Domain/ProxyGR-domain.list | awk '{print "  - \047" $0 "\047"}' >> rules/Domain/ProxyGR.yaml
+          curl -fsSL \
+            "https://raw.githubusercontent.com/Rcftngqmgq/ClashRules/refs/heads/main/rules/Domain/ProxyGR.list" \
+            -o rules/Domain/ProxyGR.list
 
-    - name: Convert ProxyGR Rules to MRS
-      run: |
-        # 使用 mihomo 转换为 MRS 格式
-        mihomo convert-ruleset domain yaml rules/Domain/ProxyGR.yaml rules/Domain/ProxyGR.mrs
-        rm -f rules/Domain/ProxyGR-domain.list
+      - name: Normalize ProxyGR domain rules
+        run: |
+          set -euo pipefail
 
-    - name: Commit and Push Changes
-      run: |
-        git add .
-        git diff-index --quiet HEAD -- || (git commit -m "Updated ProxyGR rules (ProxyGR.list -> ProxyGR.mrs)" && git push)
+          # DOMAIN-SUFFIX 转为 +.
+          # DOMAIN 保持精确匹配
+          # 已有 +. 条目直接保留
+          awk '
+            {
+              sub(/\r$/, "")
+              sub(/^[[:space:]]+/, "")
+              sub(/[[:space:]]+$/, "")
+            }
+
+            /^#/ || /^$/ { next }
+
+            /^DOMAIN-SUFFIX,/ {
+              split($0, parts, ",")
+              value = "+." parts[2]
+            }
+
+            /^DOMAIN,/ {
+              split($0, parts, ",")
+              value = parts[2]
+            }
+
+            /^\+\./ {
+              value = $0
+            }
+
+            value != "" {
+              gsub(/[[:space:]]/, "", value)
+              print value
+              value = ""
+            }
+          ' rules/Domain/ProxyGR.list \
+            | sort -u > rules/Domain/ProxyGR-domain.list
+
+          if [ ! -s rules/Domain/ProxyGR-domain.list ]; then
+            echo "::error::ProxyGR.list 中没有提取到有效域名规则"
+            exit 1
+          fi
+
+      - name: Convert ProxyGR Rules to YAML
+        run: |
+          echo "payload:" > rules/Domain/ProxyGR.yaml
+
+          awk '{print "  - \047" $0 "\047"}' \
+            rules/Domain/ProxyGR-domain.list \
+            >> rules/Domain/ProxyGR.yaml
+
+      - name: Convert ProxyGR Rules to MRS
+        run: |
+          mihomo convert-ruleset domain yaml \
+            rules/Domain/ProxyGR.yaml \
+            rules/Domain/ProxyGR.mrs
+
+          rm -f rules/Domain/ProxyGR-domain.list
+
+      - name: Commit and Push Changes
+        run: |
+          git add \
+            rules/Domain/ProxyGR.list \
+            rules/Domain/ProxyGR.yaml \
+            rules/Domain/ProxyGR.mrs
+
+          if ! git diff --cached --quiet; then
+            git commit -m "Updated ProxyGR rules (ProxyGR.list -> YAML -> MRS)"
+            git push
+          fi
