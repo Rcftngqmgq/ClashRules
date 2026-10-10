@@ -1,22 +1,19 @@
-DOMAIN-SUFFIX,hsbc.com.hk
-DOMAIN-SUFFIX,hsbc.com
-DOMAIN-SUFFIX,za.group
-DOMAIN-SUFFIX,elebank.com
-DOMAIN-SUFFIX,airstarbank.com
-DOMAIN-SUFFIX,alipayhk.com
-# DOMAIN-SUFFIX,longbridge.com
-# DOMAIN-SUFFIX,usmart.hk
-# DOMAIN-SUFFIX,zvsthk.com
-DOMAIN-SUFFIX,clubsim.com.hk
-DOMAIN-SUFFIX,hkcsl.com
-DOMAIN-SUFFIX,fortress.com.hk
-DOMAIN-SUFFIX,three.com.hk
-DOMAIN-SUFFIX,wise.com
-DOMAIN-SUFFIX,ifastgb.com
-DOMAIN-SUFFIX,myfin.bg
-DOMAIN-SUFFIX,ypt.com
-DOMAIN-SUFFIX,immortalwrt.org
-DOMAIN-SUFFIX,kyarucloud.moe
-DOMAIN-SUFFIX,openwrt.org
-DOMAIN-SUFFIX,dnshe.com
-DOMAIN-SUFFIX,vumstar.com
++.hsbc.com
++.hsbc.com.hk
++.za.group
++.elebank.com
++.airstarbank.com
++.alipayhk.com
++.clubsim.com.hk
++.hkcsl.com
++.fortress.com.hk
++.three.com.hk
++.wise.com
++.ifastgb.com
++.myfin.bg
++.ypt.com
++.immortalwrt.org
++.kyarucloud.moe
++.openwrt.org
++.dnshe.com
++.vumstar.com
