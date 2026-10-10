@@ -7,5 +7,5 @@ https://gh-proxy.com/https://raw.githubusercontent.com/xream/scripts/main/surge/
 ## // openvpn substore 文件内填入以下远程脚本：
 
 ```
-https://gh-proxy.com/https://raw.githubusercontent.com/Rcftngqmgq/ClashRules/refs/heads/main/config%20/singbox/vpngate-singbox.js
+https://gh-proxy.com/https://raw.githubusercontent.com/Rcftngqmgq/ClashRules/refs/heads/main/config%20/singbox/z-vpngatesub.js
 ```
