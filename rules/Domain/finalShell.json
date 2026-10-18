@@ -35,6 +35,40 @@
         "162.210.199.85/32",
         "162.210.196.168/32"
       ]
+    },
+    {
+      "domain": [
+        "dig.bdurl.net",
+        "mcs.snssdk.com",
+        "mon.zijieapi.com",
+        "vc-brain.ndcpp.com",
+        "thanos.zijieapi.com",
+        "p3-ecom-qualification-sign.ecombdimg.com"
+      ],
+      "domain_suffix": [
+        "ugsdk.cn",
+        "ulpay.com",
+        "pangle.io",
+        "jomoxc.com",
+        "pureniox.cn",
+        "comfylink.com",
+        "qrstuvwxyzab.com",
+        "pglstatp-toutiao.com",
+        "pangolin-sdk-toutiao.com",
+        "pangolin-sdk-toutiao1.com"
+      ],
+      "domain_keyword": [
+        "ad-sign",
+        "reading-ad",
+        "ads3-normal",
+        "ads5-normal",
+        "minigame3-normal",
+        "minigame5-normal",
+        "-ex-reading-video"
+      ],
+      "domain_regex": [
+        "^tnc[0-9]+-(bjlgy|alisc1|aliec2)\\.(snssdk|zijieapi)\\.com$"
+      ]
     }
   ]
 }
