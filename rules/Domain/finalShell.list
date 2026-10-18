@@ -28,4 +28,29 @@ IP-CIDR,15.197.204.56/32,no-resolve
 IP-CIDR,162.210.199.85/32,no-resolve
 IP-CIDR,162.210.196.168/32,no-resolve
 
+# 红果 番茄
+DOMAIN,dig.bdurl.net
+DOMAIN,mcs.snssdk.com
+DOMAIN-KEYWORD,ad-sign
+DOMAIN-SUFFIX,ugsdk.cn
+DOMAIN-SUFFIX,ulpay.com
+DOMAIN-SUFFIX,pangle.io
+DOMAIN,mon.zijieapi.com
+DOMAIN-SUFFIX,jomoxc.com
+DOMAIN-KEYWORD,reading-ad
+DOMAIN-SUFFIX,pureniox.cn
+DOMAIN,vc-brain.ndcpp.com
+DOMAIN-KEYWORD,ads3-normal
+DOMAIN-KEYWORD,ads5-normal
+DOMAIN,thanos.zijieapi.com
+DOMAIN-SUFFIX,comfylink.com
+DOMAIN-SUFFIX,qrstuvwxyzab.com
+DOMAIN-KEYWORD,minigame3-normal
+DOMAIN-KEYWORD,minigame5-normal
+DOMAIN-KEYWORD,-ex-reading-video
+DOMAIN-SUFFIX,pglstatp-toutiao.com
+DOMAIN-SUFFIX,pangolin-sdk-toutiao.com
+DOMAIN-SUFFIX,pangolin-sdk-toutiao1.com
+DOMAIN,p3-ecom-qualification-sign.ecombdimg.com
+DOMAIN-REGEX,^tnc[0-9]+-(bjlgy|alisc1|aliec2)\.(snssdk|zijieapi)\.com$
 
