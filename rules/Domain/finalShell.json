@@ -69,6 +69,13 @@
       "domain_regex": [
         "^tnc[0-9]+-(bjlgy|alisc1|aliec2)\\.(snssdk|zijieapi)\\.com$"
       ]
+    },
+    {
+      "domain": [
+        "fraud-detection.engine.miui.com",
+        "flash.sec.miui.com",
+        "dm.wo.com.cn"
+      ]
     }
   ]
 }
