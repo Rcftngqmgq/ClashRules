@@ -54,3 +54,7 @@ DOMAIN-SUFFIX,pangolin-sdk-toutiao1.com
 DOMAIN,p3-ecom-qualification-sign.ecombdimg.com
 DOMAIN-REGEX,^tnc[0-9]+-(bjlgy|alisc1|aliec2)\.(snssdk|zijieapi)\.com$
 
+# MIUI
+DOMAIN-SUFFIX,fraud-detection.engine.miui.com
+DOMAIN-SUFFIX,flash.sec.miui.com
+DOMAIN-SUFFIX,dm.wo.com.cn
