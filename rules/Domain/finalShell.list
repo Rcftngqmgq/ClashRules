@@ -54,7 +54,27 @@ DOMAIN-SUFFIX,pangolin-sdk-toutiao1.com
 DOMAIN,p3-ecom-qualification-sign.ecombdimg.com
 DOMAIN-REGEX,^tnc[0-9]+-(bjlgy|alisc1|aliec2)\.(snssdk|zijieapi)\.com$
 
+# 阻断运营商
+DOMAIN-SUFFIX,dm.wo.com.cn
+DOMAIN-SUFFIX,a.fxltsbl.com
+DOMAIN-SUFFIX,b.fxltsbl.com
+DOMAIN-SUFFIX,auc.fxltsbl.com
+DOMAIN-SUFFIX,zzhc.vnet.cn
+DOMAIN-SUFFIX,vmd.vivo.com.cn
+DOMAIN-SUFFIX,vcodevisual.vivo.xyz
+DOMAIN-SUFFIX,stnetsdk.appstore.vivo.com.cn
+DOMAIN-SUFFIX,monitor-stsdk.vivo.com.cn
+DOMAIN-SUFFIX,tracking.miui.com
+DOMAIN-SUFFIX,data.mistat.xiaomi.com
+DOMAIN-SUFFIX,storeconfig.mistat.xiaomi.com
+DOMAIN-SUFFIX,tracking.intl.miui.com
+DOMAIN-SUFFIX,metrics1.data.hicloud.com
+DOMAIN-SUFFIX,metrics2.data.hicloud.com
+DOMAIN-SUFFIX,logservice.hicloud.com
+DOMAIN-SUFFIX,logservice1.hicloud.com
+DOMAIN-SUFFIX,diagmon-serviceapi.samsungdm.com
+DOMAIN-SUFFIX,dc.di.atlas.samsung.com
+
 # MIUI
 DOMAIN-SUFFIX,fraud-detection.engine.miui.com
 DOMAIN-SUFFIX,flash.sec.miui.com
-DOMAIN-SUFFIX,dm.wo.com.cn
