@@ -56,10 +56,13 @@ DOMAIN-REGEX,^tnc[0-9]+-(bjlgy|alisc1|aliec2)\.(snssdk|zijieapi)\.com$
 
 # 阻断运营商
 DOMAIN-SUFFIX,dm.wo.com.cn
+DOMAIN-SUFFIX,fxltsbl.com
 DOMAIN-SUFFIX,a.fxltsbl.com
 DOMAIN-SUFFIX,b.fxltsbl.com
 DOMAIN-SUFFIX,auc.fxltsbl.com
+DOMAIN-SUFFIX,m.fxltsbl.com
 DOMAIN-SUFFIX,zzhc.vnet.cn
+DOMAIN-SUFFIX,typdm.tydevice.com
 DOMAIN-SUFFIX,vmd.vivo.com.cn
 DOMAIN-SUFFIX,vcodevisual.vivo.xyz
 DOMAIN-SUFFIX,stnetsdk.appstore.vivo.com.cn
